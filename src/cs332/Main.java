@@ -253,20 +253,22 @@ public class Main
 	          String[] vars = eachline.split(","); //seperate everything by commas
 	          String id;
 	          int arrival_time, process_time;
-	          Processback process = new Processback();
-	          id = vars[0];
-	          arrival_time = Integer.parseInt(vars[1]);
-	          process_time = Integer.parseInt(vars[2]);
-	          process.setId(id);
-	          process.setprocess_time(process_time);
-	          process.setarrival_time(arrival_time);
+	          Processback process = new Processback(); // creates a new process object (named that way because of class collision)
+	          id = vars[0]; //setting up id
+	          arrival_time = Integer.parseInt(vars[1]); //setting up arrival time
+	          process_time = Integer.parseInt(vars[2]); //setting up process time
+	          process.setId(id); //assigning id 	
+	          process.setprocess_time(process_time);//assigning process time
+	          process.setarrival_time(arrival_time);//assigning arrival time
 
 	          
 	          arraylist.add(process);
 	          
        }
-	   Thread t1 = new Thread(new FirstComeFirstServer(arraylist));
-	   Thread t2 = new Thread(new ShortestRemainingTime(arraylist));
+	    
+	   //thread creation for each different algorithm to run simultaneously  
+	   Thread t1 = new Thread(new FirstComeFirstServer(arraylist)); 
+	   Thread t2 = new Thread(new ShortestRemainingTimes(arraylist));
 	   Thread t3 = new Thread(new round_robins(arraylist));
 	   t3.start();
 	   //t2.start();
