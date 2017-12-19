@@ -232,7 +232,67 @@ class ShortestRemainingTimes implements Runnable
 	    }
 
 	}
-}	
+}
+
+//HRRN implementation 
+class HRRN implements Runnable
+	{
+
+	int process_time[] = new int[3];// these are set to three because thats how many examples i had 
+	String pid[] = new String[3];// pid is process id, these are set to three because thats how many examples i had 
+	int arrival_time[] = new int[3];// these are set to three because thats how many examples i had 
+	int remaining_process_time[] = new int[3]; // these are set to three because thats how many examples i had 
+	float time=0; // time 
+	float RR; // this is the response ratio
+	private static ArrayList<Processback> array;
+
+	//this constructor initilizes the variables described above.
+	public HRRN(ArrayList<Processback> arraylist)
+	   {
+		   this.array = arraylist;
+		   for(int i=0;i<array.size();i++)
+			{
+			    int temp= array.get(i).getprocess_time();
+			    process_time[i] = temp;
+			    remaining_process_time[i] = process_time[i];
+				arrival_time[i] = array.get(i).getarrival_time();
+				pid[i] = array.get(i).getId();
+	
+			}
+	   }
+	
+	@Override
+	//main run method of the Runnaable interface
+	public void run() 
+	{
+		int largest = 2;
+		//outer loop to loop over each process
+		for(int i=0;i<array.size();i++)
+			{
+				if(time > arrival_time[i]) //if time is greater than arrival time calculate the waiting time and the ratio
+				{
+					//this calculates the waiting time and the ratio for the response Ratio
+					RR = ((time - arrival_time[i]) + remaining_process_time[i])/remaining_process_time[i];
+					
+					System.out.println("time is " + time);
+					System.out.println("arrival time is " + arrival_time[i]);
+					System.out.println("process time is " + remaining_process_time[i]);
+					System.out.println("RR is " + RR);
+				}
+				//foreach process display the id for the processing time
+				for(int j=0;j<array.get(i).getprocess_time();j++)
+				{
+					
+					System.out.println("Process ID " + array.get(i).getId() );
+					//remaining_process_time[j]--;
+					time++;
+				}
+	
+			}
+
+	}
+		
+}
 
 public class Main 
 {
@@ -270,6 +330,9 @@ public class Main
 	   Thread t1 = new Thread(new FirstComeFirstServer(arraylist)); 
 	   Thread t2 = new Thread(new ShortestRemainingTimes(arraylist));
 	   Thread t3 = new Thread(new round_robins(arraylist));
+	   Thread t4 = new Thread(new HRRN(arraylist));
+	   t1.start();
+	   t2.start();
 	   t3.start();
 	   //t2.start();
 	}
