@@ -239,7 +239,7 @@ public class Main
 
 	public static void main(String[] args) throws FileNotFoundException
 	{
-		String path = args[0];
+		String path = args[0]; // path variable since it had to be a command line argument
 		//System.out.println("PATH: " + path);
 		File file = new File(path); // creates new File with the name of the file I created
 	    ArrayList<Processback> arraylist = new ArrayList<Processback>();
