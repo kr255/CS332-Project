@@ -53,8 +53,9 @@ class Process {
 	}
 	 
 }
-	
-	class FirstComeFirstServer implements Runnable{
+//first come first serve implementation 
+class FirstComeFirstServer implements Runnable
+	{
 
 	int processtime[] = new int[3];
 	String pid[] = new String[3];
@@ -71,10 +72,10 @@ class Process {
 	//main run method of the Runnaable interface
 	public void run() 
 	{
-		
+		//outer loop to loop over each process
 		for(int i=0;i<array.size();i++)
 			{
-	
+				//foreach process display the id for the processing time
 				for(int j=0;j<array.get(i).getprocess_time();j++)
 				{
 					System.out.println("Process ID " + array.get(i).getId() );
@@ -85,6 +86,154 @@ class Process {
 	}
 		
 }
+//round robin implementation 	
+class round_robins implements Runnable {
+
+		int process_time[] = new int[3];
+		String pid[] = new String[3];
+		int arrival_time[] = new int[3];
+		int remaining_process_time[] = new int[3];
+		int remaining = 0;
+		int endtime;
+		int quantum = 3;
+		int init = 0;
+		private static ArrayList<Processback> array;
+
+		//this constructor initilizes the variables described above.
+		public round_robins(ArrayList<Processback> arraylist)
+		   {
+			   this.array = arraylist;
+			   for(int i=0;i<array.size();i++)
+				{
+				    int temp= array.get(i).getprocess_time(); //setting the temp with process time
+				    process_time[i] = temp;
+				    remaining_process_time[i] = process_time[i]; //setting the remanining process time the same as service 
+					arrival_time[i] = array.get(i).getarrival_time(); //setting arrival time
+					pid[i] = array.get(i).getId(); //setting Process Id
+		
+				}
+		   }
+		
+		@Override
+		//main run method of the Runnaable interface
+		public void run() 
+		{
+			// initial count for the number of processes
+			while(init <= array.size())
+			{
+				init++;
+				// here  i am incrementing for each process
+				for(int i=0;i<array.size();i++)
+				{
+					//if the remaining time of the first process is less than or equal to zero
+					//then we continue down
+					if(remaining_process_time[i] <= 0)
+					{
+						continue;
+					}
+					//if the remaining time of the i'th process is greater than the quantum we
+					//go in an additional loop and print the id out quantum time, since thats how the algo
+					//needs to process a process.
+					//then the i'th remaining process time is subtracted with the quantum
+					if(remaining_process_time[i]>quantum)
+					{
+						for(int j=0;j<quantum;j++)
+						{
+							System.out.println("Process ID " +  array.get(i).getId());
+						}
+						remaining_process_time[i] = remaining_process_time[i] - quantum;
+
+					}
+					//else if the process time is less than quantum another loop,
+					//this time running until the process time displays the id
+					//the problem here is that it doesnt queue correctly, I couldnt figure out how.
+					else if(remaining_process_time[i] < quantum)
+					{
+						for(int k=0;k<remaining_process_time[i];k++)
+						{
+							System.out.println("Process ID " +  array.get(i).getId());
+						}
+						remaining_process_time[i] = remaining_process_time[i] - quantum;
+						
+
+					}
+					//if none is true than the remaining process time is subtracted by itself.
+					else
+					{
+						remaining_process_time[i] = remaining_process_time[i] - remaining_process_time[i];
+					}
+				}
+			}
+		}
+}
+//SRT implementation the s is so it doesnt trow an error
+class ShortestRemainingTimes implements Runnable
+{
+
+	int process_time[] = new int[3];
+	String pid[] = new String[3];
+	int arrival_time[] = new int[3];
+	int remaining_process_time[] = new int[3];
+	int remaining = 0, time =0, smallest;
+
+	private static ArrayList<Processback> array;
+
+	//this constructor initilizes the variables described above.
+	public ShortestRemainingTimes(ArrayList<Processback> arraylist)
+	   {
+		   this.array = arraylist;
+		   for(int i=0;i<array.size();i++)
+			{
+			    int temp= array.get(i).getprocess_time();
+			    process_time[i] = temp;
+			    remaining_process_time[i] = process_time[i];
+				arrival_time[i] = array.get(i).getarrival_time();
+				pid[i] = array.get(i).getId();
+	
+			}
+	   }
+	
+	@Override
+	//main run method of the Runnaable interface
+	public void run() 
+	{
+		// I am attempting to figure out the incrementation of time here for every process but i think it doesnt work
+		for(time=0;remaining!=array.size();time++)
+	    {
+	        smallest=2; //setting the last index of the array to compare process times with 
+	        for(int i=0;i<array.size();i++)
+	        {
+	        	//foreach i'th interval i am trying to see if the arrival time is less than equal to time, and if 
+	        	//the remaining process time is less than the last one. Even tho i should not for the first iteration
+	        	//if the conditions meet than turning smallest into the current remaining time. 
+	            if(arrival_time[i]<= time && remaining_process_time[i]<remaining_process_time[smallest]
+	            						 && remaining_process_time[i]>0)
+	            {
+	                smallest=i;
+	                System.out.println("process ID "+ array.get(i).getId());
+	            }
+	            //on the other hand if the remaining process time is bigger than the smallest than doing the same as above
+	            else if(arrival_time[i]<= time && remaining_process_time[i]>remaining_process_time[smallest] && remaining_process_time[i]>0)
+				{
+				   smallest=i;
+				   System.out.println("process ID "+ array.get(i).getId());
+				}
+
+	        }
+	        //after the first whole iteration, reducing the remaining time of the smallest variable 
+	        remaining_process_time[smallest]--;
+	        //checking here if the remaining time is zero than incrementing the initial check, 
+	        // hopefully going to the next process. But it doesnt work, it prints three A's instead of 2
+	        if(remaining_process_time[smallest]==0)
+	        {
+	            remaining++;
+	        }
+	
+	    }
+
+	}
+}	
+
 public class Main 
 {
 
@@ -118,8 +267,8 @@ public class Main
        }
 	   Thread t1 = new Thread(new FirstComeFirstServer(arraylist));
 	   Thread t2 = new Thread(new ShortestRemainingTime(arraylist));
-	   Thread t3 = new Thread(new round_robin(arraylist));
-	   t2.start();
+	   Thread t3 = new Thread(new round_robins(arraylist));
+	   t3.start();
 	   //t2.start();
 	}
 }
