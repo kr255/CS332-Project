@@ -4,114 +4,80 @@ import java.util.ArrayList;
 
 public class round_robin implements Runnable {
 
-	 private static int completion_time[] = new int[3];
-	 private static ArrayList<Process> array;
-	 private static int process_time[] = new int[3]; 
-	 private static int wait_time[] = new int[3];
-	 private int remaining_process_time[] = new int[3];
-	 private static int turnaround_time[] = new int[3];
-	 private static int[] arrival_time = new int[3];
-	 private int quantum = 2;
-	   // constructor 
-	   public round_robin(ArrayList<Process> arraylist)
+	int process_time[] = new int[3];
+	String pid[] = new String[3];
+	int arrival_time[] = new int[3];
+	int remaining_process_time[] = new int[3];
+	int remaining = 0;
+	int endtime;
+	int quantum = 3;
+	int init = 0;
+	private static ArrayList<Processback> array;
+
+	//this constructor initilizes the variables described above.
+	public round_robin(ArrayList<Processback> arraylist)
 	   {
-	       round_robin.array = arraylist;
-			for(int i=0;i<array.size();i++)
+		   this.array = arraylist;
+		   for(int i=0;i<array.size();i++)
 			{
-			    int temp= array.get(i).getprocess_time();
+			    int temp= array.get(i).getprocess_time(); //setting the temp with process time
 			    process_time[i] = temp;
-			    remaining_process_time[i] = process_time[i];
-			    wait_time[i] = 0;
-			   
-				arrival_time[i] = array.get(i).getarrival_time();
+			    remaining_process_time[i] = process_time[i]; //setting the remanining process time the same as service 
+				arrival_time[i] = array.get(i).getarrival_time(); //setting arrival time
+				pid[i] = array.get(i).getId(); //setting Process Id
 	
 			}
 	   }
-	   
-		public int[] getCompletion_time() {
-				return completion_time;
-			}
-
-		public static void setCompletion_time() 
+	
+	@Override
+	//main run method of the Runnaable interface
+	public void run() 
+	{
+		// initial count for the number of processes
+		while(init <= array.size())
 		{
-			//this.completion_time = completion_time;
+			init++;
+			// here  i am incrementing for each process
 			for(int i=0;i<array.size();i++)
 			{
-				completion_time[i] = turnaround_time[i] + arrival_time[i];
-			}
-		}
-
-		public int[] getWaiting_time() {
-				//return waiting_time;
-				return wait_time;
-			}
-
-		private void setWaiting_time() {
-				//this.waiting_time = getTurn_around_time() - getprocess_time();
-				int currenttime = 0;
-				while(true)
+				//if the remaining time of the first process is less than or equal to zero
+				//then we continue down
+				if(remaining_process_time[i] <= 0)
 				{
-					boolean finished = true;
-					for(int i=0;i<array.size();i++)
+					continue;
+				}
+				//if the remaining time of the i'th process is greater than the quantum we
+				//go in an additional loop and print the id out quantum time, since thats how the algo
+				//needs to process a process.
+				//then the i'th remaining process time is subtracted with the quantum
+				if(remaining_process_time[i]>quantum)
+				{
+					for(int j=0;j<quantum;j++)
 					{
-						//System.out.println("remaining process time in the fuc " + remaining_process_time[i] + "");
-						if(remaining_process_time[i] > 0)
-						{
-							finished = false;
-							if(remaining_process_time[i] > quantum)
-							{
-								currenttime+=quantum;
-								remaining_process_time[i]-=quantum;
-							}
-							else
-							{
-								currenttime = currenttime + remaining_process_time[i];
-								wait_time[i] = currenttime - (process_time[i] - arrival_time[i]);
-								remaining_process_time[i] = 0;
-							}
-						}
+						System.out.println("Process ID " +  array.get(i).getId());
+					}
+					remaining_process_time[i] = remaining_process_time[i] - quantum;
 
-					}
-					if(finished == true)
+				}
+				//else if the process time is less than quantum another loop,
+				//this time running until the process time displays the id
+				//the problem here is that it doesnt queue correctly, I couldnt figure out how.
+				else if(remaining_process_time[i] < quantum)
+				{
+					for(int k=0;k<remaining_process_time[i];k++)
 					{
-						break;
+						System.out.println("Process ID " +  array.get(i).getId());
 					}
+					remaining_process_time[i] = remaining_process_time[i] - quantum;
+					
+
+				}
+				//if none is true than the remaining process time is subtracted by itself.
+				else
+				{
+					remaining_process_time[i] = remaining_process_time[i] - remaining_process_time[i];
 				}
 			}
-
-		public int[] getTurnaround_time() {
-				return turnaround_time;
-			}
-
-		public static void setTurn_around_time() {
-			//this.turn_around_time = getCompletion_time() - getarrival_time();
-			for(int i=0; i<array.size();i++)
-			{
-				turnaround_time[i] = process_time[i] + wait_time[i];
-			}
 		}
-	@Override
-	public void run()
-	{
-		// TODO Auto-generated method stub
-		//System.out.println("printing?????");
-		setTurn_around_time();
-		setWaiting_time();
-		setCompletion_time();
-
-		 
-		for(int i=0;i<array.size();i++)
-		{
-			 System.out.println("------------------------ \n");
-			 //System.out.println("completion time " + completion_time[i]);
-			 System.out.println("Process ID " + array.get(i).getId());
-			 System.out.println("process time is " + " " + process_time[i]);
-			 System.out.println("turnaround time is " + " " + getTurnaround_time()[i]);
-		     System.out.println("waiting time is " + " " + getWaiting_time()[i]);
-		     System.out.println("completion time is " + " " + getCompletion_time()[i] + "\n");
-		     System.out.println("------------------------ \n");
-		}
-		
 	}
-
 }

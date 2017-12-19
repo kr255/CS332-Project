@@ -1,17 +1,17 @@
 package cs332;
 
-public class Process {
+public class Processback {
 
 	 private String id;
 	 private int arrival_time;
 	 private int process_time;
 	
 	 
-	 public Process() 
+	 public Processback() 
 	 {
 	 }
 	 
-	 public Process(String id, int timerequire, int process_time)
+	 public Processback(String id, int timerequire, int process_time)
 	   {
 	      this.id = id;
 	      this.arrival_time = timerequire;
